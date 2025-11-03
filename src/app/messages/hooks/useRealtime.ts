@@ -17,6 +17,7 @@ export function useRealtime({
   onUserOnline
 }: UseRealtimeProps) {
   const eventSourceRef = useRef<EventSource | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleNewMessage = useCallback((message: Message) => {
     onNewMessage(message);
@@ -35,7 +36,20 @@ export function useRealtime({
     if (!user) return;
 
     const connectSSE = () => {
-      const eventSource = new EventSource('/api/realtime');
+      // Очищаем таймаут переподключения перед новым подключением
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+
+      // Закрываем предыдущее соединение если оно существует
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+
+      // Добавляем timestamp чтобы избежать кеширования соединения бразуером или CDN
+      const url = `/api/realtime?ts=${Date.now()}`;
+      const eventSource = new EventSource(url, { withCredentials: true });
       eventSourceRef.current = eventSource;
 
       eventSource.onopen = () => {
@@ -87,14 +101,20 @@ export function useRealtime({
         eventSource.close();
         
         // Переподключение через 3 секунды
-        setTimeout(connectSSE, 3000);
+        reconnectTimeoutRef.current = setTimeout(connectSSE, 3000);
       };
     };
 
     connectSSE();
 
     return () => {
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+
       eventSourceRef.current?.close();
+      eventSourceRef.current = null;
     };
   }, [user, handleNewMessage, handleMessageRead, handleUserOnline]);
 
