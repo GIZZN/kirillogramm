@@ -22,13 +22,13 @@ export async function safeFetch<T = unknown>(
     
     // Проверяем что это JSON
     if (contentType && contentType.includes('application/json')) {
-      const data = await response.json();
+      const data = await response.json() as T & { error?: string };
       
       if (response.ok) {
         return { data, status: response.status };
       } else {
         return { 
-          error: data.error || 'Произошла ошибка', 
+          error: (data as { error?: string }).error || 'Произошла ошибка', 
           status: response.status 
         };
       }
@@ -68,7 +68,7 @@ export async function safeParseJSON<T = unknown>(
       return { error: 'Неожиданный формат ответа сервера' };
     }
     
-    const data = await response.json();
+    const data = await response.json() as T;
     return { data };
   } catch (error) {
     console.error('JSON parse error:', error);
