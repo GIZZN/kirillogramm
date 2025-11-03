@@ -64,27 +64,67 @@ export function useHighlights(user: { id: number; name: string; email: string; b
         const url = URL.createObjectURL(file);
         video.src = url;
         video.preload = 'metadata';
+        video.muted = true; // Важно для автовоспроизведения
+        video.playsInline = true;
         
-        video.onloadedmetadata = () => {
-          video.currentTime = 0.1;
+        // Используем более надежный метод
+        video.onloadeddata = () => {
+          video.currentTime = 0.5; // Берем кадр в 0.5 секунды
         };
         
         video.onseeked = () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const thumbnail = canvas.toDataURL('image/png');
-            setHighlightMediaPreview(thumbnail);
+          try {
+            const canvas = document.createElement('canvas');
+            
+            // Устанавливаем размеры с сохранением пропорций
+            const maxWidth = 400;
+            const maxHeight = 200;
+            let width = video.videoWidth;
+            let height = video.videoHeight;
+            
+            if (width > maxWidth || height > maxHeight) {
+              const ratio = Math.min(maxWidth / width, maxHeight / height);
+              width = width * ratio;
+              height = height * ratio;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
+              ctx.drawImage(video, 0, 0, width, height);
+              const thumbnail = canvas.toDataURL('image/jpeg', 0.8);
+              setHighlightMediaPreview(thumbnail);
+              console.log('Video preview created successfully');
+            } else {
+              console.error('Failed to get canvas context or invalid video dimensions');
+              // Показываем заглушку для видео
+              setHighlightMediaPreview('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7inrY8L3RleHQ+PC9zdmc+');
+            }
+          } catch (error) {
+            console.error('Error creating video preview:', error);
+            setHighlightMediaPreview('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7inrY8L3RleHQ+PC9zdmc+');
+          } finally {
+            URL.revokeObjectURL(url);
           }
-          URL.revokeObjectURL(url);
         };
         
-        video.onerror = () => {
+        video.onerror = (error) => {
+          console.error('Video loading error:', error);
           URL.revokeObjectURL(url);
+          // Показываем заглушку при ошибке
+          setHighlightMediaPreview('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7inrY8L3RleHQ+PC9zdmc+');
         };
+        
+        // Добавляем таймаут на случай если видео не загрузится
+        setTimeout(() => {
+          if (!video.readyState || video.readyState < 2) {
+            console.warn('Video loading timeout');
+            URL.revokeObjectURL(url);
+            setHighlightMediaPreview('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7inrY8L3RleHQ+PC9zdmc+');
+          }
+        }, 5000);
       } else {
         setHighlightForm(prev => ({ ...prev, mediaType: 'image' }));
         const reader = new FileReader();
