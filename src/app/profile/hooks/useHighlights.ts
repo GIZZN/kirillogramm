@@ -53,7 +53,9 @@ export function useHighlights(user: { id: number; name: string; email: string; b
   const handleHighlightMediaSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      console.log('File selected:', file.name, file.type, file.size);
       setSelectedHighlightMedia(file);
+      setHighlightMediaPreview(null); // Сбрасываем старое превью
       
       // Автоматически определяем тип медиа
       if (file.type.startsWith('video/')) {
@@ -64,102 +66,40 @@ export function useHighlights(user: { id: number; name: string; email: string; b
         const url = URL.createObjectURL(file);
         video.src = url;
         video.preload = 'metadata';
-        video.muted = true; // Важно для автовоспроизведения
-        video.playsInline = true;
         
-        // Используем более надежный метод
-        video.onloadeddata = () => {
-          video.currentTime = 0.5; // Берем кадр в 0.5 секунды
+        video.onloadedmetadata = () => {
+          console.log('Video metadata loaded, setting currentTime to 0.1');
+          video.currentTime = 0.1;
         };
         
         video.onseeked = () => {
-          try {
-            const canvas = document.createElement('canvas');
-            
-            // Устанавливаем размеры с сохранением пропорций
-            const maxWidth = 400;
-            const maxHeight = 200;
-            let width = video.videoWidth;
-            let height = video.videoHeight;
-            
-            if (width > maxWidth || height > maxHeight) {
-              const ratio = Math.min(maxWidth / width, maxHeight / height);
-              width = width * ratio;
-              height = height * ratio;
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            
-            if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
-              ctx.drawImage(video, 0, 0, width, height);
-              const thumbnail = canvas.toDataURL('image/jpeg', 0.8);
-              setHighlightMediaPreview(thumbnail);
-              console.log('Video preview created successfully');
-            } else {
-              console.error('Failed to get canvas context or invalid video dimensions');
-              // Показываем заглушку для видео
-              setHighlightMediaPreview('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7inrY8L3RleHQ+PC9zdmc+');
-            }
-          } catch (error) {
-            console.error('Error creating video preview:', error);
-            setHighlightMediaPreview('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7inrY8L3RleHQ+PC9zdmc+');
-          } finally {
-            URL.revokeObjectURL(url);
+          console.log('Video seeked, creating thumbnail');
+          const canvas = document.createElement('canvas');
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          console.log(`Canvas size: ${canvas.width}x${canvas.height}`);
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const thumbnail = canvas.toDataURL('image/png');
+            console.log('Thumbnail created:', thumbnail.substring(0, 50) + '...');
+            setHighlightMediaPreview(thumbnail);
+          } else {
+            console.error('Failed to get canvas context');
           }
-        };
-        
-        video.onerror = (error) => {
-          console.error('Video loading error:', error);
           URL.revokeObjectURL(url);
-          // Показываем заглушку при ошибке
-          setHighlightMediaPreview('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7inrY8L3RleHQ+PC9zdmc+');
         };
         
-        // Добавляем таймаут на случай если видео не загрузится
-        setTimeout(() => {
-          if (!video.readyState || video.readyState < 2) {
-            console.warn('Video loading timeout');
-            URL.revokeObjectURL(url);
-            setHighlightMediaPreview('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7inrY8L3RleHQ+PC9zdmc+');
-          }
-        }, 5000);
+        video.onerror = (e) => {
+          console.error('Video loading error:', e);
+          URL.revokeObjectURL(url);
+        };
       } else {
         setHighlightForm(prev => ({ ...prev, mediaType: 'image' }));
         const reader = new FileReader();
         reader.onload = (e) => {
-          const img = new Image();
-           img.onload = () => {
-             // Максимальные размеры для превью (соответствуют CSS)
-             const maxWidth = 400;
-             const maxHeight = 200;
-            
-            let width = img.width;
-            let height = img.height;
-            
-            // Вычисляем новые размеры сохраняя пропорции
-            if (width > maxWidth || height > maxHeight) {
-              const ratio = Math.min(maxWidth / width, maxHeight / height);
-              width = width * ratio;
-              height = height * ratio;
-            }
-            
-            // Создаем canvas для изменения размера
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            
-            if (ctx) {
-              ctx.drawImage(img, 0, 0, width, height);
-              const resizedPreview = canvas.toDataURL('image/jpeg', 0.9);
-              setHighlightMediaPreview(resizedPreview);
-            } else {
-              setHighlightMediaPreview(e.target?.result as string);
-            }
-          };
-          img.src = e.target?.result as string;
+          console.log('Image loaded, setting preview');
+          setHighlightMediaPreview(e.target?.result as string);
         };
         reader.readAsDataURL(file);
       }
@@ -196,6 +136,21 @@ export function useHighlights(user: { id: number; name: string; email: string; b
       formData.append('title', highlightForm.title);
       formData.append('mediaType', highlightForm.mediaType);
       formData.append('media', fileToUpload);
+
+      if (highlightForm.mediaType === 'video') {
+        if (!highlightMediaPreview) {
+          alert('Не удалось создать превью видео. Попробуйте выбрать файл ещё раз.');
+          return;
+        }
+
+        try {
+          const previewResponse = await fetch(highlightMediaPreview);
+          const thumbnailBlob = await previewResponse.blob();
+          formData.append('thumbnail', thumbnailBlob, 'thumbnail.png');
+        } catch (error) {
+          console.error('Error converting video preview to thumbnail blob:', error);
+        }
+      }
 
       const response = await fetch('/api/highlights', {
         method: 'POST',

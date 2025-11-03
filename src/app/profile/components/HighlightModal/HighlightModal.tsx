@@ -138,7 +138,7 @@ export function HighlightModal({
                     src={highlightMediaPreview}
                     alt="Preview"
                     width={400}
-                    height={250}
+                    height={300}
                     className={styles.previewImage}
                   />
                 )}
