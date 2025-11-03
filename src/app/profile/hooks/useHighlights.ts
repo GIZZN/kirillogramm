@@ -35,8 +35,12 @@ export function useHighlights(user: { id: number; name: string; email: string; b
       });
       
       if (response.ok) {
-        const data = await response.json();
-        setHighlights(data.highlights || []);
+        try {
+          const data = await response.json();
+          setHighlights(data.highlights || []);
+        } catch (parseError) {
+          console.error('Error parsing highlights:', parseError);
+        }
       }
     } catch (error) {
       console.error('Error fetching highlights:', error);
@@ -149,8 +153,12 @@ export function useHighlights(user: { id: number; name: string; email: string; b
         setHighlightMediaPreview(null);
         fetchHighlights();
       } else {
-        const error = await response.json();
-        alert(error.error || 'Ошибка при создании сториса');
+        try {
+          const error = await response.json();
+          alert(error.error || 'Ошибка при создании сториса');
+        } catch {
+          alert('Ошибка сервера при создании сториса');
+        }
       }
     } catch (error) {
       console.error('Error creating highlight:', error);
@@ -167,16 +175,20 @@ export function useHighlights(user: { id: number; name: string; email: string; b
       });
       
       if (response.ok) {
-        const { highlight: fullHighlight } = await response.json();
-        setSelectedHighlight(fullHighlight);
-        setShowHighlightViewer(true);
-        setVideoControls({
-          isPlaying: false,
-          currentTime: 0,
-          duration: 0,
-          isMuted: true,
-          volume: 1
-        });
+        try {
+          const { highlight: fullHighlight } = await response.json();
+          setSelectedHighlight(fullHighlight);
+          setShowHighlightViewer(true);
+          setVideoControls({
+            isPlaying: false,
+            currentTime: 0,
+            duration: 0,
+            isMuted: true,
+            volume: 1
+          });
+        } catch (parseError) {
+          console.error('Error parsing highlight:', parseError);
+        }
       }
     } catch (error) {
       console.error('Error loading highlight:', error);

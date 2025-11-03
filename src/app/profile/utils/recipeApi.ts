@@ -46,13 +46,21 @@ export const submitRecipe = async (
       }),
     });
 
-    if (response.ok) {
+    try {
       const data = await response.json();
-      const recipeId = data.recipe?.id || editingRecipe?.id;
-      return { success: true, recipeId };
-    } else {
-      const error = await response.json();
-      return { success: false, error: error.error || `Произошла ошибка при ${isEditing ? 'обновлении' : 'добавлении'} рецепта` };
+      
+      if (response.ok) {
+        const recipeId = data.recipe?.id || editingRecipe?.id;
+        return { success: true, recipeId };
+      } else {
+        return { success: false, error: data.error || `Произошла ошибка при ${isEditing ? 'обновлении' : 'добавлении'} рецепта` };
+      }
+    } catch (parseError) {
+      console.error('Error parsing recipe response:', parseError);
+      return { 
+        success: false, 
+        error: `Ошибка сервера при ${isEditing ? 'обновлении' : 'добавлении'} рецепта` 
+      };
     }
   } catch (error) {
     console.error('Error submitting recipe:', error);

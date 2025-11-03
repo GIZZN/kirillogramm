@@ -20,10 +20,17 @@ export function useProfileManager(user: { id: number; name: string; email: strin
       });
       
       if (response.ok) {
-        const data = await response.json();
-        const bio = data.bio || user?.bio || 'Нет информации о себе';
-        setUserBio(bio);
-        setBioText(bio);
+        try {
+          const data = await response.json();
+          const bio = data.bio || user?.bio || 'Нет информации о себе';
+          setUserBio(bio);
+          setBioText(bio);
+        } catch (parseError) {
+          console.error('Error parsing user bio:', parseError);
+          const fallbackBio = user?.bio || '';
+          setUserBio(fallbackBio);
+          setBioText(fallbackBio);
+        }
       } else {
         // Если био не найдено, используем данные из контекста или дефолтное
         const defaultBio = user?.bio || '';
@@ -105,7 +112,12 @@ export function useProfileManager(user: { id: number; name: string; email: strin
         setAvatarPreview(null);
         fetchUserData();
       } else {
-        alert('Ошибка при загрузке аватара');
+        try {
+          const errorData = await response.json();
+          alert(`Ошибка: ${errorData.error || 'Не удалось загрузить аватар'}`);
+        } catch {
+          alert('Ошибка сервера при загрузке аватара');
+        }
       }
     } catch (error) {
       console.error('Error uploading avatar:', error);
@@ -128,8 +140,12 @@ export function useProfileManager(user: { id: number; name: string; email: strin
         await fetchUserData();
         alert('Аватарка удалена');
       } else {
-        const errorData = await response.json();
-        alert(`Ошибка: ${errorData.error}`);
+        try {
+          const errorData = await response.json();
+          alert(`Ошибка: ${errorData.error || 'Не удалось удалить аватар'}`);
+        } catch {
+          alert('Ошибка сервера при удалении аватара');
+        }
       }
     } catch (error) {
       console.error('Error deleting avatar:', error);

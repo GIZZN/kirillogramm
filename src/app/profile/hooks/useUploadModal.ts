@@ -47,20 +47,49 @@ export function useUploadModal() {
 
     try {
       setUploading(true);
-      const formData = new FormData();
-      formData.append('title', uploadForm.title);
-      formData.append('description', uploadForm.description);
-      formData.append('category', uploadForm.category);
-      formData.append('hashtags', uploadForm.hashtags);
-      formData.append('image', selectedImage);
-
+      
+      // Сначала создаем рецепт
       const response = await fetch('/api/recipes', {
         method: 'POST',
         credentials: 'include',
-        body: formData
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: uploadForm.title,
+          description: uploadForm.description,
+          category: uploadForm.category,
+          ingredients: ['Фото'],
+          instructions: 'Фотография',
+          time: '0 мин',
+          servings: 1,
+          difficulty: 'Легко',
+          is_public: true,
+          is_approved: true,
+          hashtags: uploadForm.hashtags.split(' ').filter(tag => tag.trim().length > 0)
+        }),
       });
 
       if (response.ok) {
+        const data = await response.json();
+        const recipeId = data.recipe?.id;
+        
+        // Затем загружаем изображение
+        if (recipeId && selectedImage) {
+          const formData = new FormData();
+          formData.append('image', selectedImage);
+          
+          const imageResponse = await fetch(`/api/recipes/${recipeId}/image`, {
+            method: 'POST',
+            credentials: 'include',
+            body: formData
+          });
+          
+          if (!imageResponse.ok) {
+            console.error('Error uploading image');
+          }
+        }
+        
         closeUploadModal();
         onSuccess?.();
       } else {

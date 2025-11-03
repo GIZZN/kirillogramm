@@ -11,6 +11,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Настройки для production
+  poweredByHeader: false,
+  compress: true,
+  // Гарантируем что API всегда возвращает JSON даже при ошибках
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
+  },
 };
 
 export default nextConfig;

@@ -40,8 +40,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
+        try {
+          const data = await response.json();
+          setUser(data.user);
+        } catch (parseError) {
+          console.error('Failed to parse auth response:', parseError);
+          setUser(null);
+        }
       } else {
         setUser(null);
       }
@@ -79,13 +84,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setUser(data.user);
-        return { success: true };
-      } else {
-        return { success: false, error: data.error };
+      try {
+        const data = await response.json();
+        
+        if (response.ok) {
+          setUser(data.user);
+          return { success: true };
+        } else {
+          return { success: false, error: data.error || 'Ошибка авторизации' };
+        }
+      } catch (parseError) {
+        console.error('Failed to parse login response:', parseError);
+        return { success: false, error: 'Ошибка сервера' };
       }
     } catch (error) {
       console.error('Login failed:', error);
@@ -104,13 +114,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({ email, password, name }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setUser(data.user);
-        return { success: true };
-      } else {
-        return { success: false, error: data.error };
+      try {
+        const data = await response.json();
+        
+        if (response.ok) {
+          setUser(data.user);
+          return { success: true };
+        } else {
+          return { success: false, error: data.error || 'Ошибка регистрации' };
+        }
+      } catch (parseError) {
+        console.error('Failed to parse register response:', parseError);
+        return { success: false, error: 'Ошибка сервера' };
       }
     } catch (error) {
       console.error('Registration failed:', error);

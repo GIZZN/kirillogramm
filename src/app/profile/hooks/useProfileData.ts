@@ -27,8 +27,9 @@ export function useProfileData(user: { id: number; name: string; email: string; 
       });
 
       if (response.ok) {
-        const data = await response.json();
-        // Преобразуем рецепты в формат фото
+        try {
+          const data = await response.json();
+          // Преобразуем рецепты в формат фото
         const photos = data.recipes.map((recipe: {
           id: number;
           title: string;
@@ -53,6 +54,9 @@ export function useProfileData(user: { id: number; name: string; email: string; 
           category: recipe.category
         }));
         setUserPhotos(photos);
+        } catch (parseError) {
+          console.error('Error parsing user photos:', parseError);
+        }
       }
     } catch (error) {
       console.error('Error fetching user photos:', error);
@@ -71,10 +75,11 @@ export function useProfileData(user: { id: number; name: string; email: string; 
       });
 
       if (response.ok) {
-        const data = await response.json();
-        
-        // Преобразуем данные избранного в формат UserPhoto
-        const photos: UserPhoto[] = data.favorites.map((fav: {
+        try {
+          const data = await response.json();
+          
+          // Преобразуем данные избранного в формат UserPhoto
+          const photos: UserPhoto[] = data.favorites.map((fav: {
           id: number;
           title: string;
           description: string;
@@ -98,6 +103,9 @@ export function useProfileData(user: { id: number; name: string; email: string; 
         }));
 
         setSavedPhotos(photos);
+        } catch (parseError) {
+          console.error('Error parsing saved photos:', parseError);
+        }
       }
     } catch (error) {
       console.error('Error fetching saved photos:', error);
@@ -117,28 +125,36 @@ export function useProfileData(user: { id: number; name: string; email: string; 
       ]);
       
       if (recipesResponse.ok) {
-        const data = await recipesResponse.json();
-        const photos = data.recipes || [];
-        
-        const totalPhotos = photos.length;
-        const totalLikes = photos.reduce((sum: number, photo: UserPhoto) => sum + photo.likes_count, 0);
-        const totalViews = photos.reduce((sum: number, photo: UserPhoto) => sum + photo.views_count, 0);
-        
-        setStats(prev => ({
-          ...prev,
-          totalPhotos,
-          totalLikes,
-          totalViews
-        }));
+        try {
+          const data = await recipesResponse.json();
+          const photos = data.recipes || [];
+          
+          const totalPhotos = photos.length;
+          const totalLikes = photos.reduce((sum: number, photo: UserPhoto) => sum + photo.likes_count, 0);
+          const totalViews = photos.reduce((sum: number, photo: UserPhoto) => sum + photo.views_count, 0);
+          
+          setStats(prev => ({
+            ...prev,
+            totalPhotos,
+            totalLikes,
+            totalViews
+          }));
+        } catch (parseError) {
+          console.error('Error parsing recipes stats:', parseError);
+        }
       }
 
       if (profileStatsResponse.ok) {
-        const profileStats = await profileStatsResponse.json();
-        setStats(prev => ({
-          ...prev,
-          followers: profileStats.followers || 0,
-          following: profileStats.following || 0
-        }));
+        try {
+          const profileStats = await profileStatsResponse.json();
+          setStats(prev => ({
+            ...prev,
+            followers: profileStats.followers || 0,
+            following: profileStats.following || 0
+          }));
+        } catch (parseError) {
+          console.error('Error parsing profile stats:', parseError);
+        }
       }
     } catch (error) {
       console.error('Error fetching user stats:', error);
