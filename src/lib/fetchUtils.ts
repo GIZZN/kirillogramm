@@ -22,14 +22,22 @@ export async function safeFetch<T = unknown>(
     
     // Проверяем что это JSON
     if (contentType && contentType.includes('application/json')) {
-      const data = await response.json() as T & { error?: string };
-      
-      if (response.ok) {
-        return { data, status: response.status };
-      } else {
-        return { 
-          error: (data as { error?: string }).error || 'Произошла ошибка', 
-          status: response.status 
+      try {
+        const data = await response.json() as T & { error?: string };
+        
+        if (response.ok) {
+          return { data, status: response.status };
+        } else {
+          return { 
+            error: (data as { error?: string }).error || 'Произошла ошибка', 
+            status: response.status 
+          };
+        }
+      } catch (parseError) {
+        console.error('Failed to parse JSON response:', parseError);
+        return {
+          error: 'Ошибка парсинга ответа сервера',
+          status: response.status
         };
       }
     } else {
