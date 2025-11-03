@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { Highlight, HighlightForm, VideoControls } from '../types';
+import { compressImage } from '@/lib/imageCompression';
 
 export function useHighlights(user: { id: number; name: string; email: string; bio?: string; avatarUrl?: string | null } | null) {  
   const [highlights, setHighlights] = useState<Highlight[]>([]);
@@ -135,10 +136,26 @@ export function useHighlights(user: { id: number; name: string; email: string; b
 
     try {
       setUploadingHighlight(true);
+      
+      // Сжимаем файл если он слишком большой (>4MB для Vercel Free)
+      let fileToUpload = selectedHighlightMedia;
+      const maxSize = 4 * 1024 * 1024; // 4MB
+      
+      if (fileToUpload.size > maxSize) {
+        if (highlightForm.mediaType === 'image') {
+          // Сжимаем изображение
+          fileToUpload = await compressImage(fileToUpload, { maxSizeMB: 4, quality: 0.8 });
+        } else {
+          alert('Видео слишком большое. Максимальный размер: 4MB. Пожалуйста, сожмите видео перед загрузкой.');
+          setUploadingHighlight(false);
+          return;
+        }
+      }
+      
       const formData = new FormData();
       formData.append('title', highlightForm.title);
       formData.append('mediaType', highlightForm.mediaType);
-      formData.append('media', selectedHighlightMedia);
+      formData.append('media', fileToUpload);
 
       const response = await fetch('/api/highlights', {
         method: 'POST',

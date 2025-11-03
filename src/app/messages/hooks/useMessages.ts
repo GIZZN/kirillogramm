@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { Message, Chat, User } from '../types';
+import { ensureFileSize } from '@/lib/imageCompression';
 
 export function useMessages(user: User | null) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -118,11 +119,14 @@ export function useMessages(user: User | null) {
   const sendImage = useCallback(async (file: File, selectedChat: Chat | null) => {
     if (!selectedChat || !user) return;
 
-    const formData = new FormData();
-    formData.append('chatId', selectedChat.id.toString());
-    formData.append('image', file);
-
     try {
+      // Сжимаем файл если он слишком большой
+      const compressedFile = await ensureFileSize(file, 4);
+      
+      const formData = new FormData();
+      formData.append('chatId', selectedChat.id.toString());
+      formData.append('image', compressedFile);
+
       const response = await fetch('/api/messages/upload-image', {
         method: 'POST',
         credentials: 'include',

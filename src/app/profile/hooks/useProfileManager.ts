@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { ensureFileSize } from '@/lib/imageCompression';
 
 export function useProfileManager(user: { id: number; name: string; email: string; bio?: string; avatarUrl?: string | null } | null, fetchUserData: () => void) {
   const [userBio, setUserBio] = useState('');
@@ -92,8 +93,12 @@ export function useProfileManager(user: { id: number; name: string; email: strin
 
     try {
       setUploadingAvatar(true);
+      
+      // Сжимаем файл если он слишком большой
+      const compressedFile = await ensureFileSize(avatarFile, 4);
+      
       const formData = new FormData();
-      formData.append('avatar', avatarFile);
+      formData.append('avatar', compressedFile);
 
       const response = await fetch('/api/user/avatar', {
         method: 'POST',
