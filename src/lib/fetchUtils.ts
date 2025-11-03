@@ -7,7 +7,7 @@ interface FetchOptions extends RequestInit {
   credentials?: RequestCredentials;
 }
 
-export async function safeFetch<T = any>(
+export async function safeFetch<T = unknown>(
   url: string,
   options?: FetchOptions
 ): Promise<{ data?: T; error?: string; status: number }> {
@@ -56,7 +56,7 @@ export async function safeFetch<T = any>(
 /**
  * Безопасный парсинг JSON ответа
  */
-export async function safeParseJSON<T = any>(
+export async function safeParseJSON<T = unknown>(
   response: Response
 ): Promise<{ data?: T; error?: string }> {
   try {
