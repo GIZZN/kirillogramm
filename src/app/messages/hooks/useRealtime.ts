@@ -67,7 +67,25 @@ export function useRealtime({
             case 'new_message':
               if (data.message) {
                 console.log('SSE received new message:', data.message);
-                handleNewMessage(data.message);
+
+                const rawMessage = data.message as unknown as Record<string, unknown>;
+                const rawChatId = rawMessage.chatId ?? rawMessage.chat_id;
+                const rawSenderId = rawMessage.senderId ?? rawMessage.sender_id;
+                const normalizedMessage: Message = {
+                  ...data.message,
+                  chatId: rawChatId !== undefined && rawChatId !== null
+                    ? Number(rawChatId)
+                    : undefined,
+                  senderId: rawSenderId !== undefined && rawSenderId !== null
+                    ? Number(rawSenderId)
+                    : Number(data.message.senderId),
+                  messageType: data.message.messageType
+                    || (data.message.imageData ? 'image' : 'text'),
+                  createdAt: data.message.createdAt || new Date().toISOString(),
+                  isRead: Boolean(data.message.isRead)
+                };
+
+                handleNewMessage(normalizedMessage);
               }
               break;
             case 'message_read':
