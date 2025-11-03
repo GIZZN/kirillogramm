@@ -83,6 +83,7 @@ export function useProfileManager(user: { id: number; name: string; email: strin
       const reader = new FileReader();
       reader.onload = (e) => {
         setAvatarPreview(e.target?.result as string);
+        setShowAvatarModal(true); // Открываем модальное окно для подтверждения
       };
       reader.readAsDataURL(file);
     }
@@ -95,7 +96,16 @@ export function useProfileManager(user: { id: number; name: string; email: strin
       setUploadingAvatar(true);
       
       // Сжимаем файл если он слишком большой
-      const compressedFile = await ensureFileSize(avatarFile, 4);
+      let compressedFile;
+      try {
+        compressedFile = await ensureFileSize(avatarFile, 4);
+        console.log('Compressed file size:', compressedFile.size / (1024 * 1024), 'MB');
+      } catch (compressionError) {
+        console.error('Compression error:', compressionError);
+        alert('Не удалось обработать изображение. Попробуйте другой файл.');
+        setUploadingAvatar(false);
+        return;
+      }
       
       const formData = new FormData();
       formData.append('avatar', compressedFile);
@@ -111,9 +121,11 @@ export function useProfileManager(user: { id: number; name: string; email: strin
         setAvatarFile(null);
         setAvatarPreview(null);
         fetchUserData();
+        alert('Аватар успешно обновлен!');
       } else {
         try {
           const errorData = await response.json();
+          console.error('Server error:', errorData);
           alert(`Ошибка: ${errorData.error || 'Не удалось загрузить аватар'}`);
         } catch {
           alert('Ошибка сервера при загрузке аватара');
@@ -121,7 +133,7 @@ export function useProfileManager(user: { id: number; name: string; email: strin
       }
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      alert('Ошибка при загрузке аватара');
+      alert(`Ошибка при загрузке аватара: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
     } finally {
       setUploadingAvatar(false);
     }
