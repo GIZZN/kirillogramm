@@ -96,14 +96,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Проверяем тип файла
+    // Проверяем тип файла (убраны все ограничения на размер)
     let isValidType = false;
     let duration = 0;
 
     if (mediaType === 'video') {
       isValidType = mediaFile.type.startsWith('video/');
-      // Для видео устанавливаем максимальную длительность 60 секунд
-      duration = 60; // Можно добавить логику определения реальной длительности
+      duration = 0; // Без ограничений на длительность
     } else {
       isValidType = mediaFile.type.startsWith('image/');
     }

@@ -25,18 +25,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Проверяем тип файла
+    // Проверяем тип файла (убраны все ограничения на размер)
     if (!imageFile.type.startsWith('image/')) {
       return NextResponse.json(
         { error: 'Файл должен быть изображением' },
-        { status: 400 }
-      );
-    }
-
-    // Проверяем размер файла (максимум 5MB)
-    if (imageFile.size > 5 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: 'Размер файла не должен превышать 5MB' },
         { status: 400 }
       );
     }

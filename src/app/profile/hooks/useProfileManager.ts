@@ -73,11 +73,6 @@ export function useProfileManager(user: { id: number; name: string; email: strin
   const handleAvatarSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Файл слишком большой. Максимальный размер: 5MB');
-        return;
-      }
-      
       if (!file.type.startsWith('image/')) {
         alert('Можно загружать только изображения');
         return;

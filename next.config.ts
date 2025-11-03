@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
   // Гарантируем что API всегда возвращает JSON даже при ошибках
   experimental: {
     serverActions: {
-      bodySizeLimit: '10mb',
+      bodySizeLimit: '100mb', // Увеличен лимит для загрузки видео и больших файлов
     },
   },
 };

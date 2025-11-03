@@ -2,6 +2,18 @@
   "functions": {
     "src/app/api/realtime/route.ts": {
       "maxDuration": 300
+    },
+    "src/app/api/highlights/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "src/app/api/user/avatar/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "src/app/api/messages/upload-image/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
     }
   },
   "rewrites": [

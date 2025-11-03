@@ -170,12 +170,6 @@ export function useMessages(user: User | null) {
         alert('Пожалуйста, выберите изображение');
         return;
       }
-      
-      // Проверяем размер файла (5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Размер файла не должен превышать 5MB');
-        return;
-      }
 
       // sendImage будет вызван из основного компонента
     }
