@@ -1,0 +1,648 @@
+/* Highlight Viewer Modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.75) 50%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+  backdrop-filter: blur(30px) saturate(1.2);
+  -webkit-backdrop-filter: blur(30px) saturate(1.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: clamp(16px, 4vw, 40px);
+  animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@keyframes modalFadeIn {
+  from { 
+    opacity: 0;
+    transform: scale(0.95);
+    backdrop-filter: blur(0px);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+    backdrop-filter: blur(30px) saturate(1.2);
+  }
+}
+
+.modalContentCircle {
+  width: clamp(400px, 50vw, 520px);
+  height: clamp(400px, 50vw, 520px);
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  animation: modalSlideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  padding: clamp(16px, 3vw, 24px);
+}
+
+@keyframes modalSlideIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(30px);
+    filter: blur(4px);
+  }
+  60% {
+    opacity: 0.8;
+    transform: scale(1.02) translateY(-5px);
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
+}
+
+.modalCloseButtonCircle {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 1.25rem;
+  z-index: 10;
+}
+
+.modalCloseButtonCircle:hover {
+  background: rgba(255, 59, 48, 0.9);
+  border-color: rgba(255, 59, 48, 0.5);
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.highlightViewerCircle {
+  width: clamp(280px, 50vw, 450px);
+  height: clamp(280px, 50vw, 450px);
+  min-width: clamp(280px, 50vw, 450px);
+  min-height: clamp(280px, 50vw, 450px);
+  max-width: clamp(280px, 50vw, 450px);
+  max-height: clamp(280px, 50vw, 450px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  border: clamp(3px, 0.6vw, 5px) solid #1ed760;
+  margin: clamp(8px, 1.5vw, 16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  flex-shrink: 0;
+  flex-grow: 0;
+  position: relative;
+}
+
+.highlightVideoCircle {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.highlightImageCircle {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.highlightPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 3rem;
+}
+
+.videoThumbnailOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.videoThumbnailOverlay img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.videoControlsContainer {
+  margin-top: 32px;
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  justify-content: center;
+}
+
+.videoControls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(20, 20, 20, 0.85) 100%);
+  backdrop-filter: blur(40px) saturate(1.2);
+  -webkit-backdrop-filter: blur(40px) saturate(1.2);
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  width: 100%;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  min-width: 400px;
+  max-width: 600px;
+}
+
+.videoControls:hover {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(25, 25, 25, 0.9) 100%);
+  border-color: rgba(29, 185, 84, 0.4);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.7),
+    0 4px 16px rgba(29, 185, 84, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.playPauseButton {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  border: none;
+  border-radius: 50%;
+  color: #000000;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  box-shadow: 
+    0 3px 12px rgba(29, 185, 84, 0.4),
+    0 1px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1;
+}
+
+.playPauseButton::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(128, 128, 128, 0.4) 0%, rgba(128, 128, 128, 0.2) 70%, transparent 100%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0;
+}
+
+.playPauseButton:hover {
+  transform: scale(1.08);
+  background: linear-gradient(135deg, #1ed760 0%, #22ff6b 100%);
+  box-shadow: 
+    0 6px 20px rgba(29, 185, 84, 0.7),
+    0 3px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.playPauseButton:hover::before {
+  width: 120%;
+  height: 120%;
+  opacity: 1;
+}
+
+.playPauseButton:active {
+  transform: scale(1.05);
+}
+
+.playPauseButton:active::before {
+  width: 140%;
+  height: 140%;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+.seekBarContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 12px;
+  position: relative;
+}
+
+.seekBarWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.timeInfoContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.currentTime {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
+}
+
+.totalTime {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
+}
+
+.seekBar {
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+  border-radius: 4px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.seekBar:hover {
+  height: 10px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.2) 100%);
+}
+
+.seekBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 3px 10px rgba(29, 185, 84, 0.6),
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.seekBar::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  background: linear-gradient(135deg, #1ed760 0%, #22ff6b 100%);
+  box-shadow: 
+    0 4px 15px rgba(29, 185, 84, 0.8),
+    0 2px 6px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.seekBar::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 3px 10px rgba(29, 185, 84, 0.6),
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.seekBar::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  background: linear-gradient(135deg, #1ed760 0%, #22ff6b 100%);
+  box-shadow: 
+    0 4px 15px rgba(29, 185, 84, 0.8),
+    0 2px 6px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.volumeControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.muteButton {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1;
+}
+
+.muteButton::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(128, 128, 128, 0.3) 0%, rgba(128, 128, 128, 0.15) 70%, transparent 100%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0;
+}
+
+.muteButton:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(29, 185, 84, 0.4);
+  color: #1ed760;
+  transform: scale(1.05);
+}
+
+.muteButton:hover::before {
+  width: 120%;
+  height: 120%;
+  opacity: 1;
+}
+
+.muteButton:active {
+  transform: scale(1.02);
+}
+
+.muteButton:active::before {
+  width: 140%;
+  height: 140%;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.volumeSliderContainer {
+  width: 60px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.volumeSlider {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: all 0.3s ease;
+}
+
+.volumeSlider:hover {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 4px rgba(29, 185, 84, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.volumeSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, #1ed760 0%, #22ff6b 100%);
+  box-shadow: 0 2px 6px rgba(29, 185, 84, 0.6);
+}
+
+.volumeSlider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 4px rgba(29, 185, 84, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.volumeSlider::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, #1ed760 0%, #22ff6b 100%);
+  box-shadow: 0 2px 6px rgba(29, 185, 84, 0.6);
+}
+
+.highlightInfo {
+  padding: 16px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 16px;
+  text-align: center;
+}
+
+.highlightInfo p {
+  margin: 4px 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+}
+
+/* Large screens fix */
+@media (min-width: 1700px) {
+  .highlightViewerCircle {
+    width: 450px;
+    height: 450px;
+    min-width: 450px;
+    min-height: 450px;
+    max-width: 450px;
+    max-height: 450px;
+  }
+}
+
+/* Mobile styles for highlight viewer */
+@media (max-width: 768px) {
+  .modalContentCircle {
+    width: 450px;
+  }
+  
+  .highlightViewerCircle {
+    width: clamp(250px, 45vw, 380px);
+    height: clamp(250px, 45vw, 380px);
+    min-width: clamp(250px, 45vw, 380px);
+    min-height: clamp(250px, 45vw, 380px);
+    max-width: clamp(250px, 45vw, 380px);
+    max-height: clamp(250px, 45vw, 380px);
+    border: clamp(2px, 0.5vw, 4px) solid #1ed760;
+    margin: clamp(6px, 1.2vw, 12px);
+  }
+  
+  .videoControlsContainer {
+    max-width: 400px;
+  }
+
+  .videoControls {
+    padding: 10px 16px;
+    gap: 8px;
+    min-width: 320px;
+    max-width: 400px;
+  }
+  
+  .playPauseButton {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    font-size: 1.1rem;
+  }
+  
+  .currentTime,
+  .totalTime {
+    font-size: 0.65rem;
+  }
+  
+  .seekBarContainer {
+    margin: 0 8px;
+    gap: 3px;
+  }
+  
+  .timeInfoContainer {
+    margin-bottom: 1px;
+  }
+  
+  .muteButton {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    font-size: 0.8rem;
+  }
+  
+  .volumeSliderContainer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modalContentCircle {
+    width: 360px;
+  }
+  
+  .highlightViewerCircle {
+    width: clamp(220px, 60vw, 300px);
+    height: clamp(220px, 60vw, 300px);
+    min-width: clamp(220px, 60vw, 300px);
+    min-height: clamp(220px, 60vw, 300px);
+    max-width: clamp(220px, 60vw, 300px);
+    max-height: clamp(220px, 60vw, 300px);
+    border: clamp(2px, 0.4vw, 3px) solid #1ed760;
+    margin: clamp(4px, 1vw, 8px);
+  }
+  
+  .videoControlsContainer {
+    max-width: 320px;
+  }
+  
+  .videoControls {
+    padding: 8px 12px;
+    gap: 6px;
+    min-width: 280px;
+    max-width: 320px;
+  }
+  
+  .playPauseButton {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    font-size: 1rem;
+  }
+  
+  .currentTime,
+  .totalTime {
+    font-size: 0.6rem;
+  }
+  
+  .seekBarContainer {
+    margin: 0 6px;
+    gap: 2px;
+  }
+  
+  .timeInfoContainer {
+    margin-bottom: 1px;
+  }
+  
+  .muteButton {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+    font-size: 0.75rem;
+  }
+  
+  .volumeSliderContainer {
+    width: 45px;
+  }
+  
+  .volumeControls {
+    gap: 6px;
+  }
+}

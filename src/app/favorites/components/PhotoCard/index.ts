@@ -1,0 +1,2 @@
+export { PhotoCard } from './PhotoCard';
+
