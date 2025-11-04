@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
 import styles from './page.module.css';
@@ -21,6 +21,9 @@ export default function MessagesPage() {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Ref для отслеживания текущего выбранного чата в realtime обработчиках
+  const selectedChatRef = useRef<Chat | null>(null);
 
   // Custom hooks
   const {
@@ -59,6 +62,11 @@ export default function MessagesPage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Синхронизируем ref с state
+  useEffect(() => {
+    selectedChatRef.current = selectedChat;
+  }, [selectedChat]);
+
   // Загрузка чатов
   useEffect(() => {
     const loadChats = async () => {
@@ -91,6 +99,16 @@ export default function MessagesPage() {
   const handleNewMessage = (message: Message) => {
     console.log('New message received:', message);
     
+    // Используем ref для актуального значения selectedChat
+    const currentSelectedChat = selectedChatRef.current;
+    
+    // Если сообщение для текущего открытого чата - добавляем его сразу
+    if (currentSelectedChat && message.chatId === currentSelectedChat.id) {
+      console.log('Adding message to current chat:', message.chatId);
+      addMessage(message);
+      setTimeout(scrollToBottom, 100);
+    }
+    
     // Обновляем список чатов
     setChats(prev => {
       // Ищем существующий чат
@@ -105,7 +123,7 @@ export default function MessagesPage() {
             ...chat,
             lastMessage: message.messageType === 'image' ? '📷 Изображение' : message.content,
             lastMessageTime: message.createdAt,
-            unreadCount: selectedChat?.id === chat.id ? 0 : chat.unreadCount + 1
+            unreadCount: currentSelectedChat?.id === chat.id ? 0 : chat.unreadCount + 1
           };
         }
         return chat;
@@ -137,7 +155,7 @@ export default function MessagesPage() {
       // Автоматически открываем чат если:
       // 1. Нет выбранного чата ИЛИ
       // 2. Пришло сообщение в другой чат (переключаемся на новый)
-      if (!selectedChat || (selectedChat.id !== message.chatId && targetChat)) {
+      if (!currentSelectedChat || (currentSelectedChat.id !== message.chatId && targetChat)) {
         console.log('Auto-opening chat:', message.chatId);
         
         if (targetChat) {
@@ -151,10 +169,6 @@ export default function MessagesPage() {
           // Загружаем сообщения для этого чата
           fetchMessages(message.chatId!);
         }
-      } else if (selectedChat && message.chatId === selectedChat.id) {
-        // Если чат уже открыт - просто добавляем сообщение
-        addMessage(message);
-        setTimeout(scrollToBottom, 100);
       }
       
       // Сортируем чаты по времени последнего сообщения

@@ -89,8 +89,12 @@ export async function GET(request: NextRequest) {
           }>;
 
           if (rows.length > 0) {
-            lastMessageId = rows[rows.length - 1].id;
             for (const row of rows) {
+              // Обновляем lastMessageId после обработки каждого сообщения
+              if (row.id > lastMessageId) {
+                lastMessageId = row.id;
+              }
+
               // Избегаем дублирования сообщений для отправителя — у него уже локальная копия
               if (row.sender_id === user.id) {
                 continue;
