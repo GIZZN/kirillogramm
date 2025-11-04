@@ -99,7 +99,7 @@ export default function UserProfilePage() {
           <div className={styles.errorContainer}>
             <h2>Ошибка</h2>
             <p>{error || 'Профиль не найден'}</p>
-            <Link href="/recipes" className={styles.backButton}>
+            <Link href="/feed" className={styles.backButton}>
               <HiArrowLeft />
               Вернуться к ленте
             </Link>
@@ -117,7 +117,7 @@ export default function UserProfilePage() {
       <div className={styles.container}>
         {/* Back Button */}
         <div className={styles.backButtonContainer}>
-          <Link href="/recipes" className={styles.backButton}>
+          <Link href="/feed" className={styles.backButton}>
             <HiArrowLeft />
             Назад
           </Link>
