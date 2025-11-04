@@ -19,17 +19,64 @@ export function useRealtime({
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleNewMessage = useCallback((message: Message) => {
-    onNewMessage(message);
-  }, [onNewMessage]);
+  const toRecord = useCallback((value: unknown): Record<string, unknown> => {
+    return value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+  }, []);
 
-  const handleMessageRead = useCallback((messageId: number) => {
-    onMessageRead(messageId);
-  }, [onMessageRead]);
+  const normalizeMessage = useCallback((rawMessage: unknown): Message => {
+    const messageRecord = toRecord(rawMessage) as Record<string, unknown> & Partial<Message>;
 
-  const handleUserOnline = useCallback((userId: number, isOnline: boolean) => {
-    onUserOnline(userId, isOnline);
-  }, [onUserOnline]);
+    const getNumber = (value: unknown): number | undefined => {
+      if (value === undefined || value === null) return undefined;
+      const num = Number(value);
+      return Number.isNaN(num) ? undefined : num;
+    };
+
+    const chatId = getNumber(messageRecord.chatId ?? messageRecord['chat_id']);
+    const senderId = getNumber(messageRecord.senderId ?? messageRecord['sender_id']);
+    const messageId = getNumber(messageRecord.id ?? messageRecord['id']) ?? Date.now();
+
+    const messageType = (messageRecord.messageType ?? messageRecord['message_type']) as Message['messageType'] | undefined;
+    const imageData = (messageRecord.imageData ?? messageRecord['image_data']) as string | undefined;
+
+    return {
+      id: messageId,
+      chatId,
+      senderId: senderId ?? 0,
+      senderName: (messageRecord.senderName ?? messageRecord['sender_name'] ?? '') as string,
+      senderAvatar: (messageRecord.senderAvatar ?? messageRecord['sender_avatar']) as string | undefined,
+      content: (messageRecord.content ?? '') as string,
+      createdAt: (messageRecord.createdAt ?? messageRecord['created_at'] ?? new Date().toISOString()) as string,
+      messageType: messageType ?? (imageData ? 'image' : 'text'),
+      imageData,
+      isRead: Boolean(messageRecord.isRead ?? messageRecord['is_read'])
+    };
+  }, [toRecord]);
+
+  const normalizeId = useCallback((value?: number | string | null) => {
+    if (value === undefined || value === null) return undefined;
+    const num = Number(value);
+    return Number.isNaN(num) ? undefined : num;
+  }, []);
+
+  const handleNewMessage = useCallback((message: unknown) => {
+    const normalized = normalizeMessage(message);
+    onNewMessage(normalized);
+  }, [onNewMessage, normalizeMessage]);
+
+  const handleMessageRead = useCallback((messageId: number | string | null | undefined) => {
+    const normalizedId = normalizeId(messageId);
+    if (normalizedId !== undefined) {
+      onMessageRead(normalizedId);
+    }
+  }, [onMessageRead, normalizeId]);
+
+  const handleUserOnline = useCallback((userId: number | string | null | undefined, isOnline: boolean) => {
+    const normalizedId = normalizeId(userId);
+    if (normalizedId !== undefined) {
+      onUserOnline(normalizedId, isOnline);
+    }
+  }, [onUserOnline, normalizeId]);
 
   // Инициализация SSE
   useEffect(() => {
@@ -59,6 +106,7 @@ export function useRealtime({
       eventSource.onmessage = (event) => {
         try {
           const data: SSEMessage = JSON.parse(event.data);
+          const dataRecord = toRecord(data);
           
           switch (data.type) {
             case 'connected':
@@ -67,41 +115,17 @@ export function useRealtime({
             case 'new_message':
               if (data.message) {
                 console.log('SSE received new message:', data.message);
-
-                const rawMessage = data.message as unknown as Record<string, unknown>;
-                const rawChatId = rawMessage.chatId ?? rawMessage.chat_id;
-                const rawSenderId = rawMessage.senderId ?? rawMessage.sender_id;
-                const normalizedMessage: Message = {
-                  ...data.message,
-                  chatId: rawChatId !== undefined && rawChatId !== null
-                    ? Number(rawChatId)
-                    : undefined,
-                  senderId: rawSenderId !== undefined && rawSenderId !== null
-                    ? Number(rawSenderId)
-                    : Number(data.message.senderId),
-                  messageType: data.message.messageType
-                    || (data.message.imageData ? 'image' : 'text'),
-                  createdAt: data.message.createdAt || new Date().toISOString(),
-                  isRead: Boolean(data.message.isRead)
-                };
-
-                handleNewMessage(normalizedMessage);
+                handleNewMessage(data.message);
               }
               break;
             case 'message_read':
-              if (data.messageId) {
-                handleMessageRead(data.messageId);
-              }
+              handleMessageRead(data.messageId ?? (dataRecord['message_id'] as number | string | null | undefined));
               break;
             case 'user_online':
-              if (data.userId) {
-                handleUserOnline(data.userId, true);
-              }
+              handleUserOnline(data.userId ?? (dataRecord['user_id'] as number | string | null | undefined), true);
               break;
             case 'user_offline':
-              if (data.userId) {
-                handleUserOnline(data.userId, false);
-              }
+              handleUserOnline(data.userId ?? (dataRecord['user_id'] as number | string | null | undefined), false);
               break;
             case 'ping':
               // Игнорируем пинг сообщения
@@ -134,7 +158,7 @@ export function useRealtime({
       eventSourceRef.current?.close();
       eventSourceRef.current = null;
     };
-  }, [user, handleNewMessage, handleMessageRead, handleUserOnline]);
+  }, [user, handleNewMessage, handleMessageRead, handleUserOnline, toRecord]);
 
   return {
     eventSourceRef
