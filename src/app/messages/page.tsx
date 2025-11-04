@@ -35,6 +35,7 @@ export default function MessagesPage() {
 
   const {
     messages,
+    setMessages,
     newMessage,
     setNewMessage,
     loadingMessages,
@@ -44,7 +45,6 @@ export default function MessagesPage() {
     scrollToBottom,
     sendMessage,
     sendImage,
-    addMessage,
     markMessageAsRead
   } = useMessages(user);
 
@@ -152,8 +152,14 @@ export default function MessagesPage() {
           fetchMessages(message.chatId!);
         }
       } else if (selectedChat && message.chatId === selectedChat.id) {
-        // Если чат уже открыт - просто добавляем сообщение
-        addMessage(message);
+        // Если чат уже открыт - добавляем сообщение сразу в список
+        setMessages(prev => {
+          // Проверяем, нет ли сообщения с таким ID
+          if (prev.some(msg => msg.id === message.id)) {
+            return prev;
+          }
+          return [...prev, message];
+        });
         setTimeout(scrollToBottom, 100);
       }
       
