@@ -153,12 +153,12 @@ export async function GET(request: NextRequest) {
       };
 
       // Запускаем циклический опрос базы
-      const messagesInterval = setInterval(pollMessages, 3000);
-      const readsInterval = setInterval(pollReads, 4000);
+      const messagesInterval = setInterval(pollMessages, 1500);
+      const readsInterval = setInterval(pollReads, 2500);
 
       // Делаем начальный опрос с небольшой задержкой, чтобы успеть инициализировать max id
-      setTimeout(pollMessages, 1000);
-      setTimeout(pollReads, 1500);
+      setTimeout(pollMessages, 400);
+      setTimeout(pollReads, 800);
 
       // Очистка при закрытии соединения
       request.signal.addEventListener('abort', () => {
