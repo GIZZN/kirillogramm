@@ -87,7 +87,7 @@ export async function GET(
     const followersCount = parseInt((followersResult.rows[0] as { followers_count: string }).followers_count);
     const followingCount = parseInt((followingResult.rows[0] as { following_count: string }).following_count);
 
-    // Получаем публичные рецепты пользователя
+    // Получаем публичные посты пользователя
     const recipesResult = await query(`
       SELECT 
         id, title, category, description, 

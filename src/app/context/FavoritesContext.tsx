@@ -32,7 +32,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
 
-  // Загружаем избранные рецепты из API при авторизации
+  // Загружаем избранные посты из API при авторизации
   useEffect(() => {
     if (user) {
       loadFavoritesFromAPI();

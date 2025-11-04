@@ -470,7 +470,7 @@ export default function RecipesPage() {
           {filteredRecipes.length === 0 && !loading && (
             <div className={styles.emptyState}>
               <span className={styles.emptyIcon}>🔍</span>
-              <h3>Рецепты не найдены</h3>
+              <h3>Посты не найдены</h3>
               <p>Попробуйте изменить параметры поиска</p>
             </div>
           )}

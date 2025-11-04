@@ -29,7 +29,7 @@ export function useProfileData(user: { id: number; name: string; email: string; 
       if (response.ok) {
         try {
           const data = await response.json();
-          // Преобразуем рецепты в формат фото
+          // Преобразуем посты в формат фото
         const photos = data.recipes.map((recipe: {
           id: number;
           title: string;

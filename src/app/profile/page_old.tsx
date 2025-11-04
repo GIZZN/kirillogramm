@@ -163,7 +163,7 @@ export default function ProfilePage() {
 
       if (response.ok) {
         const data = await response.json();
-        // Преобразуем рецепты в формат фото
+        // Преобразуем посты в формат фото
         const photos = data.recipes.map((recipe: {
           id: number;
           title: string;

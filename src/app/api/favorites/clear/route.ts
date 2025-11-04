@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 import { query } from '@/lib/db';
 
-// Очистить все избранные рецепты пользователя
+// Очистить все избранные посты пользователя
 export async function DELETE(request: NextRequest) {
   try {
     const token = request.cookies.get('auth-token')?.value;
@@ -15,14 +15,14 @@ export async function DELETE(request: NextRequest) {
     }
 
     const user = verifyToken(token);
-    if (!user) {
+    if (!user) {  
       return NextResponse.json(
         { error: 'Недействительный токен' },
         { status: 401 }
       );
     }
 
-    // Удаляем все избранные рецепты пользователя
+    // Удаляем все избранные посты пользователя
     const result = await query(
       `DELETE FROM user_favorites WHERE user_id = $1`,
       [user.id]
@@ -30,7 +30,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json(
       { 
-        message: 'Все избранные рецепты удалены',
+        message: 'Все избранные посты удалены',
         deletedCount: result.rowCount 
       },
       { status: 200 }

@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Получаем все рецепты, которые лайкнул пользователь
+    // Получаем все посты, которые лайкнул пользователь
     const result = await query(
       `SELECT recipe_id FROM user_recipe_likes WHERE user_id = $1`,
       [user.id]

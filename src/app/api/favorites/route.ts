@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 import { query } from '@/lib/db';
 
-// Получить избранные рецепты пользователя
+// Получить избранные посты пользователя
 export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get('auth-token')?.value;
@@ -33,8 +33,8 @@ export async function GET(request: NextRequest) {
       )
     `);
 
-    // Получаем избранные рецепты пользователя
-    const result = await query(
+    // Получаем избранные посты пользователя
+    const result = await query( 
       `SELECT 
         ur.id, ur.title, ur.category, ur.description, ur.ingredients, ur.instructions,
         ur.time, ur.servings, ur.difficulty, ur.views_count, ur.likes_count,

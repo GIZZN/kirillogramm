@@ -22,9 +22,9 @@ export default function BestDishes({ recipes, loading = false }: BestDishesProps
       <div className={styles.bestDishesContainer}>
         <div className={styles.bestDishesHeader}>
           <span className={styles.bestDishesTag}>⭐ Рекомендуем</span>
-          <h2 className={styles.bestDishesTitle}>Лучшие блюда</h2>
+          <h2 className={styles.bestDishesTitle}>Лучшие посты</h2>
           <p className={styles.bestDishesSubtitle}>
-            Самые популярные рецепты от наших пользователей
+            Самые популярные посты от наших пользователей
           </p>
         </div>
         

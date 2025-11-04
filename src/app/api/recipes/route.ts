@@ -157,7 +157,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Получаем рецепты пользователя с дополнительной статистикой
+    // Получаем посты пользователя с дополнительной статистикой
     const result = await query(
       `SELECT 
         id, title, category, description, ingredients, instructions, 
