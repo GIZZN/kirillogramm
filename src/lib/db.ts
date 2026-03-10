@@ -4,6 +4,11 @@ let pool: Pool | null = null;
 
 export function getPool(): Pool {
   if (!pool) {
+    // Пропускаем инициализацию БД во время сборки
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
+      throw new Error('Database not available during build phase');
+    }
+    
     // КРИТИЧЕСКАЯ ДИАГНОСТИКА - ПОКАЗЫВАЕМ ВСЕ ПЕРЕМЕННЫЕ
     console.log('=== CRITICAL DATABASE CONNECTION DIAGNOSTICS ===');
     console.log('VERCEL ENVIRONMENT:', process.env.VERCEL);
