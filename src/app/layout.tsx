@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kirillogramm",
-  description: "Kirillogramm - сервис для обмена фотографиями и видео",
+  title: "SHARKTECH",
+  description: "SHARKTECH - сервис для обмена фотографиями и видео",
 };
 
 export default function RootLayout({

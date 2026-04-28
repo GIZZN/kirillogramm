@@ -138,7 +138,7 @@ export function getPool(): Pool {
       keepAlive: true,
       keepAliveInitialDelayMillis: 10000,
       // Настройки для работы с внешним сервером
-      application_name: 'Kirillogtamm-Vercel',
+      application_name: 'SHARKTECH-Vercel',
     });
     
     pool.on('error', (err) => {

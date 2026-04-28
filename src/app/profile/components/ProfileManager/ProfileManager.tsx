@@ -95,11 +95,9 @@ const ProfileManagerComponent = ({
     <div className={styles.profileActions}>
       <h1 className={styles.username}>@{user?.name?.toLowerCase().replace(/\s+/g, '_')}</h1>
       <div className={styles.actionButtons}>
-        <button className={styles.settingsButton}>
+        <button className={styles.settingsButton}
+        onClick={onEditBio}>
           <HiCog6Tooth />
-        </button>
-        <button className={styles.menuButton}>
-          <HiEllipsisHorizontal />
         </button>
       </div>
     </div>
@@ -188,13 +186,6 @@ const ProfileManagerComponent = ({
                     </span>
                   ))}
                 </p>
-                <button 
-                  className={styles.bioEditButton}
-                  onClick={onEditBio}
-                >
-                  <HiPencil />
-                  Редактировать
-                </button>
               </div>
             )}
           </div>

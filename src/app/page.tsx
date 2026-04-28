@@ -54,7 +54,7 @@ export default function Home() {
                   <path d="M19 15L20.09 18.26L24 19L20.09 19.74L19 23L17.91 19.74L14 19L17.91 18.26L19 15Z" fill="currentColor"/>
                   <path d="M5 6L5.5 7.5L7 8L5.5 8.5L5 10L4.5 8.5L3 8L4.5 7.5L5 6Z" fill="currentColor"/>
                 </svg>
-                <span>KIRILLOGRAMM - ДЕЛИСЬ МОМЕНТАМИ</span>
+                <span>SHARKTECH - ДЕЛИСЬ МОМЕНТАМИ</span>
               </div>
               
               <h1 className={styles.title}>

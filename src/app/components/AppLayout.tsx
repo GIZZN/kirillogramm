@@ -41,7 +41,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <>
       <Header
-        logoText="Kirillogramm"
+        logoText="SHARKTECH"
         onProfileClick={handleProfileClick}
         isAuthenticated={isAuthenticated}
         user={user}

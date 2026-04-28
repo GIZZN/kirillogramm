@@ -862,9 +862,6 @@ export default function ProfilePage() {
                   <button className={styles.settingsButton}>
                     <HiCog6Tooth />
                   </button>
-                  <button className={styles.menuButton}>
-                    <HiEllipsisHorizontal />
-                </button>
                 </div>
               </div>
 
